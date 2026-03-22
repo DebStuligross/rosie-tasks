@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Crown body -->
+  <polygon points="4,22 4,11 9,16 16,7 23,16 28,11 28,22" fill="#FFD700"/>
+  <!-- Crown base band -->
+  <rect x="4" y="21" width="24" height="5" rx="1" fill="#FFC200"/>
+  <!-- Outline/depth -->
+  <polygon points="4,22 4,11 9,16 16,7 23,16 28,11 28,22" fill="none" stroke="#E6A800" stroke-width="0.8"/>
+  <!-- Jewels -->
+  <circle cx="16" cy="10" r="2" fill="#FF4D6D"/>
+  <circle cx="7" cy="19" r="1.5" fill="#4DAAFF"/>
+  <circle cx="25" cy="19" r="1.5" fill="#4DAAFF"/>
+  <circle cx="16" cy="23.5" r="1.5" fill="#4DFF99"/>
+</svg>

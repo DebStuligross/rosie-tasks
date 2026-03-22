@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__google-drive__getGoogleSheetContent",
+      "mcp__google-drive__authGetStatus",
+      "mcp__google-drive-tttr__getGoogleSheetContent",
+      "mcp__google-drive__addSheet",
+      "mcp__google-drive__updateGoogleSheet",
+      "mcp__google-drive__formatGoogleSheetText",
+      "mcp__google-drive__search",
+      "mcp__google-drive__getGoogleDocContent",
+      "mcp__google-drive__readGoogleDoc",
+      "mcp__google-drive__listFolder",
+      "mcp__google-drive__getSpreadsheetInfo",
+      "mcp__google-drive__addPermission",
+      "mcp__google-drive__appendSpreadsheetRows"
+    ]
+  }
+}
