@@ -15,5 +15,20 @@
       "mcp__google-drive__addPermission",
       "mcp__google-drive__appendSpreadsheetRows"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase",
+    "gmail",
+    "google-calendar",
+    "google-drive",
+    "slack-tttr",
+    "slack-personal",
+    "slack-personal-user",
+    "slack-tttr-user",
+    "google-drive-tttr",
+    "gmail-tttr",
+    "asana-official",
+    "notion-personal",
+    "miro-tttr"
+  ]
 }
