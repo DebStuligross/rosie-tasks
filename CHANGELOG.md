@@ -1,5 +1,7 @@
 # Deb's Task Master — Revision History
 
+## v1.10 — 2026-03-22
+
 ## v1.06 — 2026-02-23
 - Overdue virtual status: tasks with past due dates automatically display as OVERDUE, sort above TODAY
 - Overdue checkbox added to Show: filter (on by default)
