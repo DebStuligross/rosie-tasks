@@ -96,6 +96,7 @@ Deb's daily workflow:
 - No build step — edit `index.html` directly, browser refresh to test
 - `netlify dev` must be running for Sheets API calls to work (local dev only)
 - The app is desktop-only by design
+- Netlify deployment is manual and intentionally not connected to GitHub auto-deploy (free tier credit preservation). To deploy, use Netlify CLI or drag-and-drop via Netlify dashboard.
 
 ## GitHub Workflow
 This project is managed in GitHub at https://github.com/DebStuligross/rosie-tasks
@@ -109,3 +110,4 @@ This project is managed in GitHub at https://github.com/DebStuligross/rosie-task
 - After merge: switch to main, pull, delete the feature branch locally
 
 **Branch protection is active on main** — direct pushes will be rejected by GitHub.
+
