@@ -13,7 +13,9 @@
       "mcp__google-drive__listFolder",
       "mcp__google-drive__getSpreadsheetInfo",
       "mcp__google-drive__addPermission",
-      "mcp__google-drive__appendSpreadsheetRows"
+      "mcp__google-drive__appendSpreadsheetRows",
+      "Skill(update-config)",
+      "Skill(update-config:*)"
     ]
   },
   "enabledMcpjsonServers": [
