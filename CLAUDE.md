@@ -101,13 +101,12 @@ Deb's daily workflow:
 ## GitHub Workflow
 This project is managed in GitHub at https://github.com/DebStuligross/rosie-tasks
 
-**Rules:**
-- Never commit directly to `main`
-- Always create a feature branch for every change, no matter how small
-- Branch naming convention: `brief-description-of-change` (e.g. `fix-overdue-sort`, `add-recurrence-ui`)
-- Push branch to GitHub and open a pull request
-- Deb reviews the diff and merges the PR
-- After merge: switch to main, pull, delete the feature branch locally
+**Workflow:** Commit and push directly to `main`. GitHub serves as version history — if something breaks, roll back to a previous commit.
 
-**Branch protection is active on main** — direct pushes will be rejected by GitHub.
+**Steps:**
+1. Make changes and test locally
+2. Commit to `main` with a short descriptive message
+3. Push to GitHub
+
+**Rollback:** If something breaks, use `git log` to find a good commit and `git revert` or `git checkout` to restore it.
 
