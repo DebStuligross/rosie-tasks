@@ -73,7 +73,7 @@
     /* Toolbar */
     .toolbar {
       background: var(--bg-white);
-      padding: 8px 24px;
+      padding: 6px 24px 4px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -112,7 +112,7 @@
     .status-pill.active.sps-new      { background: #f3f4f6; color: #374151; border-color: #9ca3af; }
     .status-pill.active.sps-overdue  { background: #FFF0F2; color: #C0392B; border-color: #fca5a5; }
     .status-pill.active.sps-due      { background: #FFF3E0; color: #E65100; border-color: #fdba74; }
-    .status-pill.active.sps-waiting  { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
+    .status-pill.active.sps-waiting  { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
     .status-pill.active.sps-nextup   { background: #cfe2f3; color: #1e4d78; border-color: #93c5fd; }
     .status-pill.active.sps-soon     { background: #fef9c3; color: #854d0e; border-color: #fde047; }
     .status-pill.active.sps-someday  { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
@@ -126,7 +126,7 @@
     .archive-toggle-btn.active { background: #fff3cd; border-color: #e0a800; color: #7a5000; }
 
     /* Search */
-    .search-wrap { position: relative; display: flex; align-items: center; }
+    .search-wrap { position: relative; display: flex; align-items: center; margin-left: auto; }
     .search-input { width: 360px; padding-right: 24px !important; cursor: text; }
     .search-clear {
       position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
@@ -204,7 +204,7 @@
     /* Column Headers — narrower title, wider waiting */
     .col-headers {
       display: grid;
-      grid-template-columns: 32px 1.05fr 110px 100px 110px 100px 260px 40px;
+      grid-template-columns: 32px 1.05fr 110px 100px 100px 110px 260px 40px;
       gap: 0; padding: 8px 12px 8px 0;
       font-size: 11px; font-weight: 600; text-transform: uppercase;
       color: var(--text-muted); letter-spacing: 0.5px;
@@ -218,7 +218,7 @@
     /* Task Row */
     .task-row {
       display: grid;
-      grid-template-columns: 32px 1.05fr 110px 100px 110px 100px 260px 40px;
+      grid-template-columns: 32px 1.05fr 110px 100px 100px 110px 260px 40px;
       gap: 0; padding: 0; background: var(--bg-white);
       border-radius: 6px; margin-bottom: 2px;
       box-shadow: var(--shadow); transition: box-shadow 0.15s; overflow: hidden;
@@ -259,10 +259,10 @@
     .status-badge.overdue { background: #FFF0F2; color: #C0392B; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .status-badge.due { background: #FFF3E0; color: #E65100; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .status-badge.today { background: var(--today-light); color: var(--today); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .task-row.vs-due { background: #FFD0A0 !important; }
-    .task-row.vs-due:hover { background: #FFC080 !important; filter: none !important; }
-    .task-row.vs-due .task-cell { color: inherit !important; font-weight: 600 !important; }
-    .task-row.vs-due .task-detail { background: #FFD0A0 !important; }
+    .task-row.row-overdue { background: #FFD0A0 !important; }
+    .task-row.row-overdue:hover { background: #FFC080 !important; filter: none !important; }
+    .task-row.row-overdue .task-detail { background: #FFD0A0 !important; }
+
     .status-badge.active { background: #dcfce7; color: #166534; }
     .status-badge.soon { background: #fef9c3; color: #854d0e; }
     .status-badge.waiting { background: #fce7f3; color: #9d174d; }
@@ -576,9 +576,10 @@
   <div class="header">
     <div class="header-brand">
       <img src="deb-photo.png" alt="Deb" class="header-avatar" onerror="this.style.display='none'">
-      <h1>Deb's Task Master<span>powered by Rosie · v1.10</span></h1>
+      <h1>Deb's Task Master<span>v1.11</span></h1>
     </div>
     <div class="header-actions">
+      <button class="plan-day-btn" onclick="openPlanMyDay()">☀️ Plan My Day</button>
       <button class="header-btn" onclick="toggleQuickAdd()">+ Add Task</button>
       <button class="header-btn" onclick="refreshTasks()">Refresh</button>
       <button class="header-btn" onclick="openAdmin()">Admin</button>
@@ -626,7 +627,6 @@
           <option value="">All</option>
         </select>
       </div>
-      <button class="plan-day-btn" onclick="openPlanMyDay()">☀️ Plan My Day</button>
     </div>
   </div>
 
@@ -800,6 +800,7 @@ let config = {
     { field: 'status',   value: 'TODAY',    rowBg: '#FFF8E1', textColor: '',        bold: true,  italic: false, allCaps: false },
     { field: 'status',   value: 'Next Up!', rowBg: '#cfe2f3', textColor: '',        bold: false, italic: false, allCaps: false },
     { field: 'status',   value: 'Active',   rowBg: '#d9ead3', textColor: '',        bold: false, italic: false, allCaps: false },
+    { field: 'status',   value: 'Waiting',  rowBg: '',        textColor: '#999999', bold: false, italic: false, allCaps: false },
   ]
 };
 
@@ -822,11 +823,11 @@ const sortColMap = { status: COL.STATUS, priority: COL.PRIORITY, domain: COL.DOM
 let sortPrimary   = { key: 'status',   asc: true };
 let sortSecondary = { key: 'due', asc: true };
 
-const DEFAULT_STATUSES = ['New', 'Overdue', 'Due!', 'TODAY', 'Active', 'Next Up!', 'Waiting'];
+const DEFAULT_STATUSES = ['New', 'TODAY', 'Active', 'Next Up!', 'Waiting'];
 let activeStatuses = new Set(DEFAULT_STATUSES);
 
 const priorityOrder = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-const statusOrder   = { Active: -5, TODAY: -4, New: -3, Overdue: -2, 'Due!': -1, Waiting: 1, 'Next Up!': 3, Soon: 4, Someday: 5, Done: 6, Archived: 99 };
+const statusOrder   = { New: -5, Active: -4, TODAY: -3, Waiting: 1, 'Next Up!': 3, Soon: 4, Someday: 5, Done: 6, Archived: 99 };
 
 const API = '/.netlify/functions/sheets';
 
@@ -970,6 +971,15 @@ document.addEventListener('click', e => {
     const p = document.getElementById(id);
     if (p && !p.contains(e.target)) p.classList.remove('visible');
   });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['statusPickerPopup','domainPickerPopup','subdomainPickerPopup','colorPickerPopup'].forEach(id => {
+      const p = document.getElementById(id);
+      if (p) p.classList.remove('visible');
+    });
+  }
 });
 
 // ===== Format Rules =====
@@ -1147,7 +1157,7 @@ async function loadTasks() {
 function renderStatusCheckboxes() {
   const container = document.getElementById('statusChecks');
   const visibleStatuses = config.statuses.filter(s => s !== 'Archived');
-  const allOptions = ['Overdue', 'Due!', ...visibleStatuses].sort((a, b) => (statusOrder[a] ?? 98) - (statusOrder[b] ?? 98));
+  const allOptions = [...visibleStatuses].sort((a, b) => (statusOrder[a] ?? 98) - (statusOrder[b] ?? 98));
   container.innerHTML = allOptions.map(s => {
     const cls = s.toLowerCase().replace(/[^a-z]/g, '');
     const active = activeStatuses.has(s) ? ' active' : '';
@@ -1169,7 +1179,7 @@ function resetStatusFilter() {
 }
 
 function showFocusMode() {
-  activeStatuses = new Set(['Active', 'TODAY']);
+  activeStatuses = new Set(['Active', 'TODAY', 'Overdue']);
   renderStatusCheckboxes();
   applyFilters();
 }
@@ -1282,9 +1292,9 @@ function renderTasks(tasks) {
       <div style="font-size:10px;padding:4px 2px;color:var(--text-muted)">#</div>
       <div>Title</div>
       <div>Status</div>
+      <div>Due Date</div>
       <div>Domain</div>
       <div>Subdomain</div>
-      <div>Due Date</div>
       <div>Waiting On</div>
       <div></div>
     </div>
@@ -1325,11 +1335,14 @@ function renderTasks(tasks) {
          <button class="btn-delete"  onclick="confirmDelete('${id}', ${sheetRow})">Delete</button>`;
 
     html += `
-      <div class="task-row priority-${priorityClass}${fmtClass ? ' ' + fmtClass : ''}${virtualStatus === 'Due!' ? ' vs-due' : ''}" id="row-${id}" data-id="${id}">
+      <div class="task-row priority-${priorityClass}${fmtClass ? ' ' + fmtClass : ''}${getDueEmoji(row) === '🔴 ' ? ' row-overdue' : ''}" id="row-${id}" data-id="${id}">
         <div class="task-cell task-id" style="min-height:42px;display:flex;align-items:center;">${esc(id)}</div>
         <div class="task-cell title-cell" onclick="toggleExpand('${id}')" ondblclick="inlineEditText(this, ${sheetRow}, ${COL.TITLE})" title="Click to expand · Double-click to edit">${esc(title)}${recurrence ? `<span class="recur-badge" title="Repeats ${recurrence.toLowerCase()}">🔄</span>` : ''}</div>
         <div class="task-cell" onclick="openStatusPicker(event, ${sheetRow})">
           <span class="status-badge ${statusClass}">${esc(displayStatus)}</span>
+        </div>
+        <div class="task-cell" onclick="inlineEditDate(this, ${sheetRow}, ${COL.DUE})">
+          <span class="due-date ${dueClass}">${getDueEmoji(row)}${due ? formatDate(due) : '\u2014'}</span>
         </div>
         <div class="task-cell priority-cell" onclick="inlineEditSelect(this, ${sheetRow}, ${COL.PRIORITY}, config.priorities)">
           <span class="priority-badge ${priorityClass}">${esc(priority)}</span>
@@ -1339,9 +1352,6 @@ function renderTasks(tasks) {
         </div>
         <div class="task-cell" onclick="openSubdomainPicker(event, ${sheetRow})">
           <span class="subdomain-text">${esc(subdomain) || '<span style="color:#ccc">\u2014</span>'}</span>
-        </div>
-        <div class="task-cell" onclick="inlineEditDate(this, ${sheetRow}, ${COL.DUE})">
-          <span class="due-date ${dueClass}">${due ? formatDate(due) : '\u2014'}</span>
         </div>
         <div class="task-cell" onclick="inlineEditText(this, ${sheetRow}, ${COL.WAITING})">
           ${esc(waiting) || '<span style="color:#ccc">\u2014</span>'}
@@ -1391,29 +1401,21 @@ function esc(str) {
   return div.innerHTML;
 }
 
-const OVERDUE_EXEMPT = new Set(['Active', 'TODAY', 'New', 'Done', 'Archived', 'Someday']);
+const DUE_INDICATOR_EXEMPT = new Set(['Done', 'Archived']);
 
-function isOverdue(row) {
-  const due    = row[COL.DUE] || '';
-  const status = (row[COL.STATUS] || '').trim();
-  if (!due || OVERDUE_EXEMPT.has(status)) return false;
-  return getDueClass(due) === 'overdue';
+function getDueEmoji(row) {
+  if (DUE_INDICATOR_EXEMPT.has((row[COL.STATUS] || '').trim())) return '';
+  const due = row[COL.DUE] || '';
+  if (!due) return '';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = (new Date(due + 'T00:00:00') - today) / (1000 * 60 * 60 * 24);
+  if (diff < 0) return '🔴 ';
+  if (diff <= 1) return '🟡 ';
+  return '';
 }
 
-const DUE_SOON_EXEMPT = new Set(['Active', 'TODAY', 'Done', 'Archived', 'Someday']);
-
 function getVirtualStatus(row) {
-  if (isOverdue(row)) return 'Overdue';
-  const status = (row[COL.STATUS] || '').trim();
-  if (!DUE_SOON_EXEMPT.has(status)) {
-    const due = row[COL.DUE] || '';
-    if (due) {
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const diff = (new Date(due + 'T00:00:00') - today) / (1000 * 60 * 60 * 24);
-      if (diff >= 0 && diff <= 1) return 'Due!';
-    }
-  }
-  return status;
+  return (row[COL.STATUS] || '').trim();
 }
 
 function getDueClass(due) {
@@ -1563,7 +1565,11 @@ async function selectStatus(sheetRow, val) {
 
 function positionPopup(popup, e, width = 268) {
   const rect = e.currentTarget.getBoundingClientRect();
-  popup.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const top = spaceBelow >= popup.offsetHeight + 8
+    ? rect.bottom + window.scrollY + 4
+    : rect.top + window.scrollY - popup.offsetHeight - 4;
+  popup.style.top  = top + 'px';
   popup.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - width - 8) + 'px';
 }
 
@@ -1940,12 +1946,22 @@ function closePlanMyDay() {
 
 function renderPlanDayList() {
   const includeSoon = document.getElementById('planIncludeSoon')?.checked;
-  const candidateStatuses = new Set(['Overdue', 'Due!', 'Active', 'Next Up!', 'Waiting']);
+  const candidateStatuses = new Set(['Active', 'Next Up!', 'Waiting']);
   if (includeSoon) candidateStatuses.add('Soon');
+  const PLAN_EXEMPT = new Set(['Done', 'Archived', 'TODAY', 'Someday', 'New']);
 
   const candidates = allTasks
     .map((row, i) => ({ row, arrayIdx: i, sheetRow: i + 2 }))
-    .filter(({ row }) => candidateStatuses.has(getVirtualStatus(row)))
+    .filter(({ row }) => {
+      const status = (row[COL.STATUS] || '').trim();
+      if (PLAN_EXEMPT.has(status)) return false;
+      const due = row[COL.DUE] || '';
+      const isDueSoon = due && (() => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        return (new Date(due + 'T00:00:00') - today) / (1000 * 60 * 60 * 24) <= 1;
+      })();
+      return candidateStatuses.has(status) || isDueSoon;
+    })
     .sort((a, b) => {
       const va1 = getSortValue(a.row, 'status'), vb1 = getSortValue(b.row, 'status');
       if (va1 !== vb1) return va1 < vb1 ? -1 : 1;
