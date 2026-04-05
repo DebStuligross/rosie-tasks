@@ -175,6 +175,16 @@
       border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;
     }
     .plan-today-btn:hover { background: var(--periwinkle-dark); }
+    .plan-status-select {
+      font-size: 12px; padding: 3px 6px; border: 1px solid var(--border);
+      border-radius: 5px; cursor: pointer; background: white; color: var(--text); max-width: 110px;
+    }
+    .plan-archive-btn {
+      padding: 4px 8px; font-size: 11px; color: var(--text-muted);
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 5px; cursor: pointer; white-space: nowrap;
+    }
+    .plan-archive-btn:hover { color: #c0392b; border-color: #c0392b; }
     .plan-day-empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
 
     /* Quick Add */
@@ -829,7 +839,7 @@ let activeStatuses = new Set(DEFAULT_STATUSES);
 const priorityOrder = { Critical: 0, High: 1, Medium: 2, Low: 3 };
 const statusOrder   = { New: -5, Active: -4, TODAY: -3, Waiting: 1, 'Next Up!': 3, Soon: 4, Someday: 5, Done: 6, Archived: 99 };
 
-const API = '/.netlify/functions/sheets';
+const API = '/api/sheets';
 
 async function api(body) {
   const res = await fetch(API, {
@@ -979,6 +989,8 @@ document.addEventListener('keydown', e => {
       const p = document.getElementById(id);
       if (p) p.classList.remove('visible');
     });
+    const planOverlay = document.getElementById('planDayOverlay');
+    if (planOverlay && planOverlay.classList.contains('visible')) closePlanMyDay();
   }
 });
 
@@ -1468,9 +1480,12 @@ function toggleQuickAdd() {
   if (qa.classList.contains('visible')) document.getElementById('newTaskTitle').focus();
 }
 
+let _addingTask = false;
 async function addTask() {
+  if (_addingTask) return;
+  _addingTask = true;
   const title = document.getElementById('newTaskTitle').value.trim();
-  if (!title) return;
+  if (!title) { _addingTask = false; return; }
   const status    = document.getElementById('newTaskStatus').value;
   const priority  = document.getElementById('newTaskPriority').value;
   const domain    = document.getElementById('newTaskDomain').value;
@@ -1490,6 +1505,7 @@ async function addTask() {
     applyFilters();
     toast('Task added!');
   } catch (err) { toast('Error: ' + err.message); }
+  finally { _addingTask = false; }
 }
 
 // ===== Archive / Restore =====
@@ -1986,9 +2002,51 @@ function renderPlanDayList() {
         <span class="status-badge ${statusClass}">${esc(vs)}</span>
         <span class="plan-day-title">${title}</span>
         ${due ? `<span class="plan-day-meta">${due}</span>` : ''}
+        <select class="plan-status-select" onchange="planChangeStatus(${arrayIdx}, ${sheetRow}, this.value)">
+          ${config.statuses.map(s => `<option value="${esc(s)}"${s === vs ? ' selected' : ''}>${esc(s)}</option>`).join('')}
+        </select>
         <button class="plan-today-btn" onclick="planSetToday(${arrayIdx}, ${sheetRow})">Today</button>
+        <button class="plan-archive-btn" onclick="planArchive(${arrayIdx}, ${sheetRow})">Archive</button>
       </div>`;
   }).join('');
+}
+
+async function planChangeStatus(arrayIdx, sheetRow, newStatus) {
+  allTasks[arrayIdx][COL.STATUS]  = newStatus;
+  allTasks[arrayIdx][COL.UPDATED] = todayStr();
+  applyFilters();
+  renderPlanDayList();
+  try {
+    await api({ action: 'updateCell', range: `C${sheetRow}`, value: newStatus });
+    await api({ action: 'updateCell', range: `L${sheetRow}`, value: todayStr() });
+  } catch (err) { toast('Error saving: ' + err.message); }
+}
+
+async function planArchive(arrayIdx, sheetRow) {
+  const prevStatus    = allTasks[arrayIdx][COL.STATUS] || 'Active';
+  const existingNotes = allTasks[arrayIdx][COL.NOTES]  || '';
+  const archivedNotes = `[pre-archive-status: ${prevStatus}]\n${existingNotes}`.trim();
+  allTasks[arrayIdx][COL.STATUS]  = 'Archived';
+  allTasks[arrayIdx][COL.NOTES]   = archivedNotes;
+  allTasks[arrayIdx][COL.UPDATED] = todayStr();
+  applyFilters();
+  const el = document.getElementById('plan-item-' + sheetRow);
+  if (el) {
+    el.classList.add('fading');
+    setTimeout(() => {
+      el.remove();
+      if (document.querySelectorAll('.plan-day-item').length === 0) {
+        document.getElementById('planDayList').innerHTML =
+          '<div class="plan-day-empty">✅ Day planned! Your Active list is ready.</div>';
+      }
+    }, 300);
+  }
+  toast('Task archived.');
+  try {
+    await api({ action: 'updateCell', range: `C${sheetRow}`, value: 'Archived' });
+    await api({ action: 'updateCell', range: `I${sheetRow}`, value: archivedNotes });
+    await api({ action: 'updateCell', range: `L${sheetRow}`, value: todayStr() });
+  } catch (err) { toast('Error saving: ' + err.message); }
 }
 
 async function planSetToday(arrayIdx, sheetRow) {
