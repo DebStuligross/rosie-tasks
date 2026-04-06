@@ -28,7 +28,11 @@ module.exports = async (req, res) => {
 
   try {
     const sheets = await getSheets();
-    const { action, ...params } = req.body || {};
+    let parsed = req.body;
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch (e) { parsed = {}; }
+    }
+    const { action, ...params } = parsed || {};
 
     switch (action) {
       case 'getTasks': {
