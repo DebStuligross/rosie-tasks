@@ -1,7 +1,7 @@
 # Rosie Task Master — Project Context for Claude
 
 ## What This Is
-A single-page personal task management app for Deb Stuligross. No framework — pure HTML/CSS/JS in one file, backed by Google Sheets as a database, served via Netlify with a serverless function handling all sheet reads/writes.
+A single-page personal task management app for Deb Stuligross. No framework — pure HTML/CSS/JS in one file, backed by Google Sheets as a database, served via Vercel with a serverless function handling all sheet reads/writes.
 
 ## Dev Setup
 - **Start server:** `netlify dev` (or double-click `C:\Users\dasad\start-taskmaster.bat`)
@@ -14,14 +14,15 @@ A single-page personal task management app for Deb Stuligross. No framework — 
 | File | Purpose |
 |------|---------|
 | `index.html` | Entire frontend — HTML, CSS, and JS in one file |
-| `netlify/functions/sheets.js` | Serverless function — all Google Sheets API calls |
-| `netlify.toml` | Netlify config |
+| `api/sheets.js` | Vercel serverless function — all Google Sheets API calls |
+| `api/addTaskVoice.js` | Vercel serverless function — voice task entry endpoint |
+| `vercel.json` | Vercel config |
 | `favicon.svg` | App icon |
 
 ### Data Layer
 - **Database:** Google Sheets (Sheet1 tab for tasks, Config tab for settings)
 - **Spreadsheet ID:** `1wOo0wX5rNe2W29NGYe34Yckc9f4TFwfW3SZl30bJenI`
-- **All reads/writes** go through `/.netlify/functions/sheets` (`api()` function in index.html)
+- **All reads/writes** go through `/api/sheets` (`api()` function in index.html)
 - **Task IDs generated server-side** in `sheets.js` (reads existing IDs, uses max+1) — prevents duplicate IDs across devices
 
 ### Column Constants (COL object in index.html)
@@ -119,7 +120,7 @@ Deb's daily workflow:
 - No build step — edit `index.html` directly, browser refresh to test
 - `netlify dev` must be running for Sheets API calls to work (local dev only)
 - The app is desktop-only by design
-- Netlify deployment is manual and intentionally not connected to GitHub auto-deploy (free tier credit preservation). To deploy, use Netlify CLI or drag-and-drop via Netlify dashboard.
+- Vercel deployment is automatic — pushing to main triggers a redeploy. Live at https://rosie-tasks.vercel.app
 
 ## GitHub Workflow
 This project is managed in GitHub at https://github.com/DebStuligross/rosie-tasks
