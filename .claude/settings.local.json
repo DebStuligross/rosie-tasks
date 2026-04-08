@@ -15,7 +15,9 @@
       "mcp__google-drive__addPermission",
       "mcp__google-drive__appendSpreadsheetRows",
       "Skill(update-config)",
-      "Skill(update-config:*)"
+      "Skill(update-config:*)",
+      "mcp__supabase__get_project",
+      "mcp__supabase__execute_sql"
     ]
   },
   "enabledMcpjsonServers": [
