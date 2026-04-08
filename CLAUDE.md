@@ -4,9 +4,9 @@
 A single-page personal task management app for Deb Stuligross. No framework — pure HTML/CSS/JS in one file, backed by Google Sheets as a database, served via Vercel with a serverless function handling all sheet reads/writes.
 
 ## Dev Setup
-- **Start server:** `netlify dev` (or double-click `C:\Users\dasad\start-taskmaster.bat`)
-- **Local URL:** http://localhost:8888
-- **Auto-starts at login** via Windows Task Scheduler (start-taskmaster-silent.vbs)
+- **Start server:** `vercel dev` (from project root)
+- **Local URL:** http://localhost:3000
+- **Live app:** https://rosie-tasks.vercel.app
 
 ## Architecture
 
@@ -118,7 +118,7 @@ Deb's daily workflow:
 
 ## Notes
 - No build step — edit `index.html` directly, browser refresh to test
-- `netlify dev` must be running for Sheets API calls to work (local dev only)
+- `vercel dev` must be running for Sheets API calls to work (local dev only)
 - The app is desktop-only by design
 - Vercel deployment is automatic — pushing to main triggers a redeploy. Live at https://rosie-tasks.vercel.app
 
