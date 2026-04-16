@@ -108,7 +108,7 @@ Excluded: `Done`, `Archived`, `TODAY`, `Someday`, `New`
 Selecting a task sets it to **TODAY**.
 
 ## Current Version
-**v1.11**
+**v1.12**
 
 ## Workflow Context
 Deb's daily workflow:
@@ -121,6 +121,31 @@ Deb's daily workflow:
 - `vercel dev` must be running for Sheets API calls to work (local dev only)
 - The app is desktop-only by design
 - Vercel deployment is automatic — pushing to main triggers a redeploy. Live at https://rosie-tasks.vercel.app
+
+## Adding Tasks Programmatically
+
+Use the `/add-task` skill for an interactive flow. Under the hood it does one of:
+
+**Option A — via running app (preferred, auto-assigns ID):**
+```bash
+curl -s -X POST http://localhost:3000/api/sheets \
+  -H "Content-Type: application/json" \
+  -d '{"action":"addTask","row":["0","Title","Status","Priority","Domain","Subdomain","","","Notes","","YYYY-MM-DD","YYYY-MM-DD",""]}'
+```
+
+**Option B — direct Sheets MCP (if app not running):**
+1. Read `A1:A300` to find max ID → new ID = max + 1
+2. Write to `Sheet1!A[row]:M[row]` via `updateGoogleSheet`
+- Spreadsheet ID: `1wOo0wX5rNe2W29NGYe34Yckc9f4TFwfW3SZl30bJenI`
+
+### Column Order (A–M)
+`ID | Title | Status | Priority | Domain | Subdomain | Due | WaitingOn | Notes | Subtasks | Created | Updated | Recurrence`
+
+- **Status:** `New` `TODAY` `Active` `Waiting` `Next Up!` `Soon` `Someday` `Done`
+- **Priority:** `Critical` `High` `Medium` `Low`
+- **Domain:** `Personal` `Work` `AI`
+- **Due / Created / Updated:** `YYYY-MM-DD` or blank
+- After adding: hit **Refresh** in the app
 
 ## GitHub Workflow
 This project is managed in GitHub at https://github.com/DebStuligross/rosie-tasks

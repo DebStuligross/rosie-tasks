@@ -586,7 +586,7 @@
   <div class="header">
     <div class="header-brand">
       <img src="deb-photo.png" alt="Deb" class="header-avatar" onerror="this.style.display='none'">
-      <h1>Deb's Task Master<span>v1.11</span></h1>
+      <h1>Deb's Task Master<span>v1.12</span></h1>
     </div>
     <div class="header-actions">
       <button class="plan-day-btn" onclick="openPlanMyDay()">☀️ Plan My Day</button>
@@ -1863,9 +1863,9 @@ async function markDone(id, sheetRow) {
     if (recurrence) {
       const newDue = bumpDueDate(task[COL.DUE], recurrence);
       const today  = todayStr();
-      const newRow = ['0', task[COL.TITLE], 'New', task[COL.PRIORITY] || 'Medium',
+      const newRow = ['0', task[COL.TITLE], 'Soon', task[COL.PRIORITY] || 'Medium',
                       task[COL.DOMAIN] || '', task[COL.SUBDOMAIN] || '',
-                      newDue, task[COL.WAITING] || '', '', '', today, today, recurrence];
+                      newDue, task[COL.WAITING] || '', task[COL.NOTES] || '', '', today, today, recurrence];
       const result = await api({ action: 'addTask', row: newRow });
       newRow[COL.ID] = String(result.id); // use server-assigned ID
       allTasks.push(newRow);
