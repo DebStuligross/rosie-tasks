@@ -56,7 +56,7 @@ Overdue tasks also get class `row-overdue` → `background: #FFD0A0 !important` 
 `New(-5) → Active(-4) → TODAY(-3) → Waiting(1) → Next Up!(3) → Soon(4) → Someday(5) → Done(6) → Archived(99)`
 
 ### DEFAULT_STATUSES (filter pills shown by default)
-`['New', 'TODAY', 'Active', 'Next Up!', 'Waiting']`
+`['New', 'TODAY', 'Active', 'Next Up!', 'Waiting', 'Soon']`
 
 ## Config System
 Loaded from the **Config sheet tab** on startup. Stored as key/value rows:

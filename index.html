@@ -586,7 +586,7 @@
   <div class="header">
     <div class="header-brand">
       <img src="deb-photo.png" alt="Deb" class="header-avatar" onerror="this.style.display='none'">
-      <h1>Deb's Task Master<span>v1.12</span></h1>
+      <h1>Deb's Task Master<span>v1.13</span></h1>
     </div>
     <div class="header-actions">
       <button class="plan-day-btn" onclick="openPlanMyDay()">☀️ Plan My Day</button>
@@ -833,7 +833,7 @@ const sortColMap = { status: COL.STATUS, priority: COL.PRIORITY, domain: COL.DOM
 let sortPrimary   = { key: 'status',   asc: true };
 let sortSecondary = { key: 'due', asc: true };
 
-const DEFAULT_STATUSES = ['New', 'TODAY', 'Active', 'Next Up!', 'Waiting'];
+const DEFAULT_STATUSES = ['New', 'TODAY', 'Active', 'Next Up!', 'Waiting', 'Soon'];
 let activeStatuses = new Set(DEFAULT_STATUSES);
 
 const priorityOrder = { Critical: 0, High: 1, Medium: 2, Low: 3 };
@@ -1151,9 +1151,8 @@ function onNewTaskDomainChange() {
 
 async function loadTasks() {
   try {
-    const data = await api({ action: 'getTasks' });
+    const [data] = await Promise.all([api({ action: 'getTasks' }), loadConfig()]);
     allTasks = data.length > 1 ? data.slice(1).filter(r => r.length > 0 && r[0] !== '') : [];
-    await loadConfig();
     buildColorPicker();
     buildFormatStyles();
     populateFilters();
@@ -1583,10 +1582,10 @@ function positionPopup(popup, e, width = 268) {
   const rect = e.currentTarget.getBoundingClientRect();
   const spaceBelow = window.innerHeight - rect.bottom;
   const top = spaceBelow >= popup.offsetHeight + 8
-    ? rect.bottom + window.scrollY + 4
-    : rect.top + window.scrollY - popup.offsetHeight - 4;
+    ? rect.bottom + 4
+    : rect.top - popup.offsetHeight - 4;
   popup.style.top  = top + 'px';
-  popup.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - width - 8) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - width - 8) + 'px';
 }
 
 function openDomainPicker(e, sheetRow) {
