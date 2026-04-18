@@ -108,7 +108,7 @@ Excluded: `Done`, `Archived`, `TODAY`, `Someday`, `New`
 Selecting a task sets it to **TODAY**.
 
 ## Current Version
-**v1.12**
+**v1.13**
 
 ## Workflow Context
 Deb's daily workflow:
@@ -150,11 +150,11 @@ curl -s -X POST http://localhost:3000/api/sheets \
 ## GitHub Workflow
 This project is managed in GitHub at https://github.com/DebStuligross/rosie-tasks
 
-**Branch protection is on main** — changes require a PR. Workflow:
-1. Create a feature branch: `git checkout -b my-branch`
-2. Make changes and test locally
-3. Commit and push: `git push origin my-branch`
-4. Create PR on GitHub, merge via UI
-5. Sync locally: `git checkout main && git pull origin main`
+**No branch protection** — commit and push directly to main. Vercel auto-deploys on push.
+
+Workflow:
+1. Make changes and test locally with `vercel dev`
+2. Commit: `git add <files> && git commit -m "message"`
+3. Push: `git push origin main`
 
 **Rollback:** If something breaks, use `git log` to find a good commit and `git revert` or `git checkout` to restore it.
