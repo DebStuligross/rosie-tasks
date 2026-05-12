@@ -108,7 +108,7 @@ Excluded: `Done`, `Archived`, `TODAY`, `Someday`, `New`
 Selecting a task sets it to **TODAY**.
 
 ## Current Version
-**v1.13**
+**v1.14**
 
 ## Workflow Context
 Deb's daily workflow:

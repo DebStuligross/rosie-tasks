@@ -586,7 +586,7 @@
   <div class="header">
     <div class="header-brand">
       <img src="deb-photo.png" alt="Deb" class="header-avatar" onerror="this.style.display='none'">
-      <h1>Deb's Task Master<span>v1.13</span></h1>
+      <h1>Deb's Task Master<span>v1.14</span></h1>
     </div>
     <div class="header-actions">
       <button class="plan-day-btn" onclick="openPlanMyDay()">☀️ Plan My Day</button>
@@ -837,7 +837,7 @@ const DEFAULT_STATUSES = ['New', 'TODAY', 'Active', 'Next Up!', 'Waiting', 'Soon
 let activeStatuses = new Set(DEFAULT_STATUSES);
 
 const priorityOrder = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-const statusOrder   = { New: -5, Active: -4, TODAY: -3, Waiting: 1, 'Next Up!': 3, Soon: 4, Someday: 5, Done: 6, Archived: 99 };
+const statusOrder   = { New: -5, TODAY: -4, Active: -3, Waiting: 1, 'Next Up!': 3, Soon: 4, Someday: 5, Done: 6, Archived: 99 };
 
 const API = '/api/sheets';
 
@@ -1149,10 +1149,34 @@ function onNewTaskDomainChange() {
 
 // ===== Data Load =====
 
+async function autoPromoteOverdueTasks() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const exempt = new Set(['Done', 'Archived', 'TODAY']);
+  const updated = todayStr();
+  const promises = [];
+  for (let i = 0; i < allTasks.length; i++) {
+    const row = allTasks[i];
+    const status = (row[COL.STATUS] || '').trim();
+    if (exempt.has(status)) continue;
+    const due = row[COL.DUE] || '';
+    if (!due) continue;
+    const diff = (new Date(due + 'T00:00:00') - today) / (1000 * 60 * 60 * 24);
+    if (diff <= 0) {
+      const sheetRow = i + 2;
+      row[COL.STATUS] = 'TODAY';
+      row[COL.UPDATED] = updated;
+      promises.push(api({ action: 'updateCell', range: `${colLetter(COL.STATUS)}${sheetRow}`, value: 'TODAY' }));
+      promises.push(api({ action: 'updateCell', range: `L${sheetRow}`, value: updated }));
+    }
+  }
+  if (promises.length > 0) await Promise.all(promises);
+}
+
 async function loadTasks() {
   try {
     const [data] = await Promise.all([api({ action: 'getTasks' }), loadConfig()]);
     allTasks = data.length > 1 ? data.slice(1).filter(r => r.length > 0 && r[0] !== '') : [];
+    await autoPromoteOverdueTasks();
     buildColorPicker();
     buildFormatStyles();
     populateFilters();
@@ -1772,10 +1796,19 @@ function inlineEditDate(cell, sheetRow, colIdx) {
     const val = input.value;
     allTasks[sheetRow - 2][colIdx]      = val;
     allTasks[sheetRow - 2][COL.UPDATED] = todayStr();
+    const exempt = new Set(['Done', 'Archived', 'TODAY']);
+    const status = (allTasks[sheetRow - 2][COL.STATUS] || '').trim();
+    let promoteToToday = false;
+    if (colIdx === COL.DUE && val && !exempt.has(status)) {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const diff = (new Date(val + 'T00:00:00') - today) / (1000 * 60 * 60 * 24);
+      if (diff <= 0) { allTasks[sheetRow - 2][COL.STATUS] = 'TODAY'; promoteToToday = true; }
+    }
     applyFilters();
     try {
       await api({ action: 'updateCell', range: `${colLetter(colIdx)}${sheetRow}`, value: val });
       await api({ action: 'updateCell', range: `L${sheetRow}`, value: todayStr() });
+      if (promoteToToday) await api({ action: 'updateCell', range: `${colLetter(COL.STATUS)}${sheetRow}`, value: 'TODAY' });
     } catch (err) { toast('Error: ' + err.message); }
   }
   input.addEventListener('change', save);
