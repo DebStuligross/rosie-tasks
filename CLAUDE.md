@@ -32,6 +32,8 @@ DUE=6, WAITING=7, NOTES=8, SUBTASKS=9, CREATED=10, UPDATED=11, RECURRENCE=12
 ```
 Sheet rows are 1-indexed; `allTasks` array is 0-indexed. Row 1 is headers. Task at `allTasks[i]` is at sheet row `i + 2`.
 
+**CRITICAL (v1.15):** `allTasks` keeps blank/ID-less sheet rows in place so the `i + 2` mapping is always exact — never filter rows out of `allTasks` on load. Blank rows are skipped at display time via `isRealTask(row)` (checks for a non-empty ID). Filtering them on load shifted every task below a blank row and sent all writes one row off (the v1.14 data-corruption bug). Also: never leave blank rows in the sheet — delete rows, don't clear their contents.
+
 ## Status System (CRITICAL)
 
 ### Stored Statuses
@@ -108,7 +110,7 @@ Excluded: `Done`, `Archived`, `TODAY`, `Someday`, `New`
 Selecting a task sets it to **TODAY**.
 
 ## Current Version
-**v1.14**
+**v1.15**
 
 ## Workflow Context
 Deb's daily workflow:
