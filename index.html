@@ -1603,12 +1603,16 @@ function openStatusPicker(e, sheetRow) {
 
 async function selectStatus(sheetRow, val) {
   document.getElementById('statusPickerPopup').classList.remove('visible');
+  const prevStatus = allTasks[sheetRow - 2][COL.STATUS];
   allTasks[sheetRow - 2][COL.STATUS]  = val;
   allTasks[sheetRow - 2][COL.UPDATED] = todayStr();
   applyFilters();
   try {
     await api({ action: 'updateCell', range: `${colLetter(COL.STATUS)}${sheetRow}`, value: val });
     await api({ action: 'updateCell', range: `L${sheetRow}`, value: todayStr() });
+    if (val === 'Done' && prevStatus !== 'Done') {
+      await spawnNextRecurrence(sheetRow);
+    }
   } catch (err) { toast('Error: ' + err.message); }
 }
 
@@ -1893,6 +1897,22 @@ async function setRecurrence(sheetRow, value) {
   } catch (err) { toast('Error: ' + err.message); }
 }
 
+async function spawnNextRecurrence(sheetRow) {
+  const task       = allTasks[sheetRow - 2];
+  const recurrence = task[COL.RECURRENCE] || '';
+  if (!recurrence) return;
+  const newDue = bumpDueDate(task[COL.DUE], recurrence);
+  const today  = todayStr();
+  const newRow = ['0', task[COL.TITLE], 'Soon', task[COL.PRIORITY] || 'Medium',
+                  task[COL.DOMAIN] || '', task[COL.SUBDOMAIN] || '',
+                  newDue, task[COL.WAITING] || '', task[COL.NOTES] || '', '', today, today, recurrence];
+  const result = await api({ action: 'addTask', row: newRow });
+  newRow[COL.ID] = String(result.id); // use server-assigned ID
+  allTasks.push(newRow);
+  applyFilters();
+  toast(`Done! Next ${recurrence.toLowerCase()} occurrence added.`);
+}
+
 async function markDone(id, sheetRow) {
   const task       = allTasks[sheetRow - 2];
   const recurrence = task[COL.RECURRENCE] || '';
@@ -1903,16 +1923,7 @@ async function markDone(id, sheetRow) {
     await api({ action: 'updateCell', range: `C${sheetRow}`, value: 'Done' });
     await api({ action: 'updateCell', range: `L${sheetRow}`, value: todayStr() });
     if (recurrence) {
-      const newDue = bumpDueDate(task[COL.DUE], recurrence);
-      const today  = todayStr();
-      const newRow = ['0', task[COL.TITLE], 'Soon', task[COL.PRIORITY] || 'Medium',
-                      task[COL.DOMAIN] || '', task[COL.SUBDOMAIN] || '',
-                      newDue, task[COL.WAITING] || '', task[COL.NOTES] || '', '', today, today, recurrence];
-      const result = await api({ action: 'addTask', row: newRow });
-      newRow[COL.ID] = String(result.id); // use server-assigned ID
-      allTasks.push(newRow);
-      applyFilters();
-      toast(`Done! Next ${recurrence.toLowerCase()} occurrence added.`);
+      await spawnNextRecurrence(sheetRow);
     } else {
       toast('Task marked done!');
     }
